@@ -1,5 +1,6 @@
 package socialIsland;
 
+import edu.princeton.cs.algs4.Graph;
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;
@@ -80,7 +81,7 @@ public interface GameMethods {
 				&& mouseY <= y + buttonSize / 2;
 	}
 
-	public static void checkForClicksCharacters(Character[] characters) {
+	public static void checkForClicksCharacters(Character[] characters, Graph g) {
 		// Continuous loop to check for mouse clicks
 		while (true) {
 			if (StdDraw.isMousePressed()) {
@@ -91,7 +92,7 @@ public interface GameMethods {
 				for (int i = 1; i < 6; i++) {
 					if (isMouseOverButton(mouseX, mouseY, characters[i].getxCoordinate(),
 							characters[i].getyCoordinate())) {
-						interaction(i);
+						interaction(i, g);
 
 					}
 				}
@@ -130,13 +131,35 @@ public interface GameMethods {
 
 	}
 
-	public static void interaction(int vertex) {
+	public static void interaction(int vertex, Graph g) {
 		// TODO
 		// draw rectangle, question dialogue, 3 buttons
 		openPopupWindow(vertex);
 		// detect clicks while loop
 		if (checkForClicksButtons() == 1) {
-			
+			g.addEdge(0, vertex);
+			StdDraw.picture(0.75, 0.25, "src/socialIsland/Resources/Dialogue.png", .5, .5);
+			StdDraw.text(0.55, 0.07, "Yay! I'm so happy we're friends");
+
+		}
+		// test print graph adjacency lists
+		StdOut.println("Adjacency List: ");
+		StdOut.println("----------------");
+		// print adjacency list
+		for (int v = 0; v < g.V(); v++) {
+			StdOut.print(v + ": ");
+			// make the first value not start with " ->"
+			boolean first = true;
+			// the method adj() will return adjacent vertices in depth-first order
+			for (int i : g.adj(v)) {
+				if (!first) {
+					StdOut.print(" -> ");
+				}
+				StdOut.print(i);
+				first = false; // this is set directly after the first value is printed
+
+			}
+			StdOut.println();
 		}
 
 		// switch:
