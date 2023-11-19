@@ -1,0 +1,28 @@
+Character Stories
+Story 1
+Hello, my name is Daisy, do you want to be friends?
+	Positive: Yes! I’d love to be friends.
+	Neutral: Not right now.
+	Negative: No, I have enough.
+Story 2
+Hello, my name is Kramer, these pretzels are making me thirsty. 
+	Positive: Offer Kramer a sip of water from your water bottle. Otherwise, this option is not allowed.
+	Neutral: You need some water.
+	Negative: Give Kramer more pretzels.
+Story 3
+Hello, this is Santa. We are giving away presents. Please take one.
+	Positive: Accept a present. 
+	Neutral: Not right now. But I’ll be back later.
+	Negative: I am the Grinch that stole Christmas.
+Story 4
+Hello, I am Leonard and I forgot to get my daughter a present for her birthday.
+	Positive: If you have a present, give Leonard a sip of water. Grateful, Leonard gives you a pretzel. Otherwise, this option is not allowed.
+	Neutral: You need to get her a present.
+	Negative: Ha, ha. No presents for your daughter this year.
+Story 5
+Hello, I am Helen. Please tell me a story.
+	Positive: Tell Helen a story.
+	Neutral: I’ll be back to tell you one soon.
+	Negative: Nope.
+
+
