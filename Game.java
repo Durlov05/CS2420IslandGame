@@ -5,6 +5,13 @@ import edu.princeton.cs.algs4.In;
 
 public class Game implements GameMethods {
 
+	/**
+	 * This is the main Game method that implements GameMethods and calls the 
+	 * functions to set up the environment and handle gameplay.
+	 * 
+	 * @author Eliza Kitchens & Syed Mujibur Rahman (Mujib)
+	 */
+	
 	public static void main(String[] args) {
 
 		Character[] characters = GameMethods.initializeCharacters(6);
