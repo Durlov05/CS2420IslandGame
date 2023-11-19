@@ -64,7 +64,7 @@ public class RemoveEdgeTest {
 			for (int adj : G.adj(v)) {
 				doublecounting = false;
 				if ((adj == vertex && v == adjacent) || (adj == adjacent && v == vertex) ) {
-				// This is used to skip adding a and b as an Edge.
+				// This is used to skip adding vertex and adjacent as an Edge.
 					continue;
 				}
 				else {
