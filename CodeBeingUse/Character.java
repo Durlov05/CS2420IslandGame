@@ -1,7 +1,14 @@
 package socialIsland;
 
 public class Character {
-	//Fields
+
+/**
+ * This Character method declares the Character features and 
+ * has many functions to set and obtain those features as needed.
+ * 
+ * @author Eliza Kitchens & Syed Mujibur Rahman (Mujib)
+ */
+	
 	private String name;
 	private String image;
 	private double xCoordinate;
