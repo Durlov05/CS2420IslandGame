@@ -1,19 +1,24 @@
 package socialIsland;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.princeton.cs.algs4.Graph;
+import edu.princeton.cs.algs4.SeparateChainingHashST;
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;
 
 public interface GameMethods {
 	
-	/**
-	 * Draws a green island window and the characters (houses and animals) in a
-	 * random arrangement. Initializes the characters with a name, image, and random
-	 * location.
-	 * 
-	 * @author Eliza Kitchens & Syed Mujibur Rahman (Mujib)
-	 */
+/**
+ * Draws a green island window and the characters (houses and animals) in a
+ * random arrangement. Initializes the characters with a name, image, and random
+ * location.
+ * 
+ * @author Eliza Kitchens & Syed Mujibur Rahman (Mujib)
+ */
+	
 	public static void setEnvironment(Character[] characters) {
 
 		// Set the game screen size
@@ -44,13 +49,42 @@ public interface GameMethods {
 	public static Character[] initializeCharacters(int numCharacters) {
 		// construct characters (store in array of Character objects)
 		Character[] characters = new Character[numCharacters];
+		List<PointOnMap> houseCoordinates = new ArrayList<PointOnMap>();	
+
 		for (int i = 1; i < numCharacters; i++) {
+			double distanceToHouse = 100.0;
+			double x;
+			double y;
+			int count = 0;
 			// Generate random coordinates for the button
-			double x = StdRandom.uniformDouble();
-			double y = StdRandom.uniformDouble();
-
-			// TODO: add x and y to a hashset to prevent duplicates
-
+			do {
+				x = StdRandom.uniformDouble();
+				y = StdRandom.uniformDouble();
+				
+				count++;
+				
+				if (i > 1) {
+					for (int j = 1; j < houseCoordinates.size(); j++) {
+						distanceToHouse = 
+								Math.sqrt(Math.pow((houseCoordinates.get(j-1).getX() - x),2) +
+								Math.pow((houseCoordinates.get(j-1).getY() - y),2));
+						if(distanceToHouse<0.4) {
+							//System.out.println("Distance Too Small.");
+							break;
+						}
+							
+					}
+				}
+				
+				if (count++>100)
+					break;
+						
+			}
+			while (distanceToHouse<0.4);
+			
+			PointOnMap houseLocation = new PointOnMap(x,y);
+			houseCoordinates.add(houseLocation);
+			
 			characters[i] = new Character("House" + i, "src/socialIsland/Resources/house" + i + ".jpeg", x, y, i);
 			// test print
 			for (int j = 1; j < numCharacters; j++) {
@@ -129,9 +163,12 @@ public interface GameMethods {
 
 				// TODO: create custom isMouseOverButton for this
 				if (isMouseOverButton(mouseX, mouseY, 0.52, 0.013)) {
-					return 1;
+					return 1; //positive
 				} else if (isMouseOverButton(mouseX, mouseY, 0.90, 0.013)) {
-					return 0;
+					return 0; //neutral
+				}
+				else if (isMouseOverButton(mouseX, mouseY, 0.99, 0.013)) {
+					return -1;  //negative
 				}
 
 			}
@@ -184,8 +221,15 @@ public interface GameMethods {
 			
 			StdDraw.pause(4_000);
 			drawEnvironment(xCoordinates, yCoordinates);
+		}
+		
+		if (checkForClicksButtons() == -1) {
+			g = RemoveEdge.RemoveEdgeMethod(g, 1, 2);
+			drawEnvironment(xCoordinates, yCoordinates);
+			StdDraw.picture(0.75, 0.25, "src/socialIsland/Resources/house2PosResponse.png", .5, .5);
 			
-
+			StdDraw.pause(4_000);
+			drawEnvironment(xCoordinates, yCoordinates);
 		}
 		// test print graph adjacency lists
 		StdOut.println("Adjacency List: ");
