@@ -1,7 +1,6 @@
 package socialIsland;
 
 import edu.princeton.cs.algs4.Graph;
-import edu.princeton.cs.algs4.In;
 
 public class Game implements GameMethods {
 
@@ -22,14 +21,15 @@ public class Game implements GameMethods {
 			xCoordinates[i] = characters[i].getxCoordinate();
 			yCoordinates[i] = characters[i].getyCoordinate();
 		}
+	
 		Graph g = new Graph(characters.length);
 
 		GameMethods.checkForClicksCharacters(characters, g, xCoordinates, yCoordinates);
-		// TODO
-		// While loop checks for character clicks
-		// trigger interaction
+		
 		
 
 	}
 
 }
+
+
