@@ -8,16 +8,32 @@ import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;
 
+/**
+ * This interface defines methods related to setting up and interacting with a
+ * game environment. It includes methods for initializing characters, drawing
+ * the environment, checking mouse clicks, and handling interactions between
+ * characters in the game.
+ *
+ * @author Eliza Kitchens & Syed Mujibur Rahman (Mujib)
+ */
+
 public interface GameMethods {
+	/**
+	 * The scale factor for the size of the houses.
+	 */
 	public double houseScale = 0.3;
-	public int screenSize = 900;
 
 	/**
-	 * Draws a green island window and the characters (houses and animals) in a
-	 * random arrangement. Initializes the characters with a name, image, and random
-	 * location.
-	 * 
-	 * @author Eliza Kitchens & Syed Mujibur Rahman (Mujib)
+	 * The size of the game screen.
+	 */
+	public int screenSize = 700;
+
+	/**
+	 * Draws a green island window and arranges characters (houses and animals)
+	 * randomly. Initializes characters with names, images, and random locations.
+	 *
+	 * @param characters An array of Character objects representing the characters
+	 *                   in the game.
 	 */
 
 	public static void setEnvironment(Character[] characters) {
@@ -47,6 +63,14 @@ public interface GameMethods {
 	// draw frienship status
 	// draw other island details
 
+	/**
+	 * Initializes characters with random coordinates and prevents them from being
+	 * too close together.
+	 *
+	 * @param numCharacters The number of characters to initialize.
+	 * @return An array of initialized Character objects.
+	 */
+
 	public static Character[] initializeCharacters(int numCharacters) {
 		// construct characters (store in array of Character objects)
 		Character[] characters = new Character[numCharacters];
@@ -54,7 +78,7 @@ public interface GameMethods {
 
 		for (int i = 1; i < numCharacters; i++) {
 			double distanceToHouse = 100.0;
-			double distanceBtwHouses = 0.4;
+			double distanceBtwHouses = 0.2;
 			double x;
 			double y;
 			int count = 0;
@@ -78,12 +102,12 @@ public interface GameMethods {
 					}
 				}
 
-				if (count++ > 100) {
+				if (count++ > 1000) {
 					System.out.println("Count was exceeded.");
 					break;
 				}
 
-			} while (distanceToHouse < distanceBtwHouses);
+			} while (distanceToHouse < distanceBtwHouses || (x > 0.5 && y < 0.27));
 
 			PointOnMap houseLocation = new PointOnMap(x, y);
 			houseCoordinates.add(houseLocation);
@@ -102,7 +126,8 @@ public interface GameMethods {
 	 * 
 	 * @param xCoordinates
 	 * @param yCoordinates
-	 * @author Eliza Kitchens
+	 * @author Eliza Kitchens // How about we skip specific call outs of methods and
+	 *         just generally state what portions we worked on in the video?
 	 */
 	public static void drawEnvironment(double[] xCoordinates, double[] yCoordinates) {
 		// Set the game screen size
@@ -129,22 +154,53 @@ public interface GameMethods {
 	}
 
 	/**
-	 * Checks if the mouse is positioned over a button.
+	 * Checks if the mouse is positioned over a House button.
 	 * 
-	 * @param mouseX
-	 * @param mouseY
-	 * @param x
-	 * @param y
-	 * @return
+	 * @param mouseX The x-coordinate of the mouse.
+	 * @param mouseY The y-coordinate of the mouse.
+	 * @param x      The x-coordinate of the button.
+	 * @param y      The y-coordinate of the button.
+	 * @return A boolean indicating whether the mouse is over the button.
 	 */
-	public static boolean isMouseOverButton(double mouseX, double mouseY, double x, double y) {
+	public static boolean isMouseOverHouseButtons(double mouseX, double mouseY, double x, double y) {
 		// Check if the mouse is over the button
-		double buttonSize = houseScale;
+		double buttonSize = houseScale - 0.1; // houseScale seems to big for this.
 
 		// checks the 4 quadrants of the character image using the coordinate of image
 		return mouseX >= x - buttonSize / 2 && mouseX <= x + buttonSize / 2 && mouseY >= y - buttonSize / 2
 				&& mouseY <= y + buttonSize / 2;
 	}
+
+	/**
+	 * Checks if the mouse is positioned over a Response button.
+	 * 
+	 * @param mouseX The x-coordinate of the mouse.
+	 * @param mouseY The y-coordinate of the mouse.
+	 * @param x      The x-coordinate of the button.
+	 * @param y      The y-coordinate of the button.
+	 * @return A boolean indicating whether the mouse is over the button.
+	 */
+
+	public static boolean isMouseOverResponseButtons(double mouseX, double mouseY, double x, double y) {
+		// Check if the mouse is over the button
+		double buttonWidthX = (0.8771 - 0.5958); // We determined the specific width by tracking our mouse clicks.
+		double buttonHeightY = (0.06 - 0); // We determined the specific width by tracking our mouse clicks.
+		// All buttons have the same width and height.
+
+		// checks the 4 quadrants of the character image using the coordinate of image
+		return mouseX >= x - buttonWidthX / 2 && mouseX <= x + buttonWidthX / 2 && mouseY >= y - buttonHeightY / 2
+				&& mouseY <= y + buttonHeightY / 2;
+	}
+
+	/**
+	 * Handles interactions between characters based on mouse clicks.
+	 *
+	 * @param characters   An array of Character objects representing the characters
+	 *                     in the game.
+	 * @param g            The Graph representing character relationships.
+	 * @param xCoordinates The x-coordinates of characters/houses.
+	 * @param yCoordinates The y-coordinates of characters/houses.
+	 */
 
 	public static void checkForClicksCharacters(Character[] characters, Graph g, double[] xCoordinates,
 			double[] yCoordinates) {
@@ -158,9 +214,9 @@ public interface GameMethods {
 				System.out.println("Mouse Location: " + mouseX + ", " + mouseY);
 				// check if the coordinates of your mouse match the coordinates of a character
 				for (int i = 1; i < 6; i++) {
-					if (isMouseOverButton(mouseX, mouseY, characters[i].getxCoordinate(),
+					if (isMouseOverHouseButtons(mouseX, mouseY, characters[i].getxCoordinate(),
 							characters[i].getyCoordinate())) {
-						interaction(i, g, xCoordinates, yCoordinates);
+						g = interaction(i, g, xCoordinates, yCoordinates);
 					}
 				}
 				try {
@@ -176,6 +232,14 @@ public interface GameMethods {
 			}
 		}
 	}
+
+	/**
+	 * Checks for mouse clicks on specific response buttons in the game window.
+	 * 
+	 * @return An integer representing the type of response button clicked: 1 for
+	 *         positive response, 0 for neutral response, -1 for negative response,
+	 *         0 if no valid response button is clicked.
+	 */
 
 	public static int checkForClicksButtons() {
 		// Continuous loop to check for mouse clicks
@@ -194,14 +258,13 @@ public interface GameMethods {
 					e.printStackTrace();
 				}
 
-				// TODO: create custom isMouseOverButton for this
-				if (isMouseOverButton(mouseX, mouseY, 0.73, 0.2)) {
+				if (isMouseOverResponseButtons(mouseX, mouseY, 0.73, 0.2171)) {
 					mousePressed = false;
 					return 1; // positive
-				} else if (isMouseOverButton(mouseX, mouseY, 0.73, 0.10)) {
+				} else if (isMouseOverResponseButtons(mouseX, mouseY, 0.73, 0.126)) {
 					mousePressed = false;
 					return 0; // neutral
-				} else if (isMouseOverButton(mouseX, mouseY, 0.73, 0.0)) {
+				} else if (isMouseOverResponseButtons(mouseX, mouseY, 0.73, 0.0238)) {
 					mousePressed = false;
 					return -1; // negative
 				} else {
@@ -271,11 +334,26 @@ public interface GameMethods {
 
 	}
 
-	public static void interaction(int vertex, Graph g, double[] xCoordinates, double[] yCoordinates) {
+	/**
+	 * Represents an interaction between characters based on a pop-up window.
+	 *
+	 * @param vertex       The vertex/character involved in the interaction.
+	 * @param g            The Graph representing character relationships.
+	 * @param xCoordinates The x-coordinates of characters/houses.
+	 * @param yCoordinates The y-coordinates of characters/houses.
+	 */
+
+	public static Graph interaction(int vertex, Graph g, double[] xCoordinates, double[] yCoordinates) {
 		// draw rectangle, question dialogue, 3 buttons
 		openPopupWindow(vertex);
 		// detect clicks while loop
-		if (checkForClicksButtons() == 1) {
+
+		int mouseReturned = checkForClicksButtons();
+		// If we don't put this in a variable, I think, this needs to run twice in the
+		// if else
+		// statement.
+
+		if (mouseReturned == 1) { // Positive case
 			// creates friendship edge
 			boolean isAdj = false;
 			for (int v : g.adj(0)) {
@@ -290,16 +368,37 @@ public interface GameMethods {
 			drawEnvironment(xCoordinates, yCoordinates);
 			// displays response
 			StdDraw.picture(0.75, 0.50, "src/socialIsland/Resources/house" + vertex + "PosResponse.png", .5, .5);
-			StdDraw.pause(4_000);
+			StdDraw.pause(1_000);
 			// displays island
 			drawEnvironment(xCoordinates, yCoordinates);
-		}
+		} else if (mouseReturned == -1) { // Negative case
+			// creates friendship edge
+			boolean isAdj = false;
+			for (int v : g.adj(0)) {
+				if (v == vertex) {
+					isAdj = true;
+				}
+			}
+			if (isAdj) {
+				Graph newG = RemoveEdge.RemoveEdgeMethod(g, 0, vertex);
+				g = newG;
+			}
 
-		if (checkForClicksButtons() == -1) {
-			g = RemoveEdge.RemoveEdgeMethod(g, 1, 2);
+			// erases buttons
 			drawEnvironment(xCoordinates, yCoordinates);
+			// displays response
+			StdDraw.picture(0.75, 0.50, "src/socialIsland/Resources/Nope.png", .5, .5);
+			StdDraw.pause(1_000);
+			// displays island
+			drawEnvironment(xCoordinates, yCoordinates);
+		} else { // Neutral case
+					// erases buttons
+			drawEnvironment(xCoordinates, yCoordinates);
+			// displays response
+			StdDraw.pause(1_000);
 		}
 		// test print graph adjacency lists
+		StdOut.println("Vertex: " + vertex);
 		StdOut.println("Adjacency List: ");
 		StdOut.println("----------------");
 		// print adjacency list
@@ -318,6 +417,7 @@ public interface GameMethods {
 			}
 			StdOut.println();
 		}
+		return g;
 
 		// switch:
 		// 1. Positive: add friendship, potentially add item to queue
