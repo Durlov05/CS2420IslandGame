@@ -87,8 +87,9 @@ public class Character {
 	 */
 	@Override
 	public String toString() {
-		return "Character [name=" + name + ", image=" + image + ", xCoordinate=" + xCoordinate + ", yCoordinate="
-				+ yCoordinate + ", vertex=" + vertex + "]";
+		return "Character: " + name + ", image: " + image + ", x: " + xCoordinate + ", y: "
+				+ yCoordinate + ", vertex: " + vertex;
 	}
 
 }
+
