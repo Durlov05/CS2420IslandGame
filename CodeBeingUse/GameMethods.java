@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.princeton.cs.algs4.Graph;
+import edu.princeton.cs.algs4.ST;
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;
@@ -27,6 +28,12 @@ public interface GameMethods {
 	 * The size of the game screen.
 	 */
 	public int screenSize = 700;
+	
+	/**
+	 * The Symbol Table used to store objects.
+	 */
+	
+	
 
 	/**
 	 * Draws a green island window and arranges characters randomly. Initializes
@@ -36,7 +43,7 @@ public interface GameMethods {
 	 *                   in the game.
 	 */
 
-	public static void setEnvironment(Character[] characters, List<Plant> plants) {
+	public static void setEnvironment(Character[] characters, List<Plant> plants, ST<String, GameObjects> objectsInGame) {
 
 		// Set the game screen size
 		StdDraw.setCanvasSize(screenSize, screenSize);
@@ -64,6 +71,19 @@ public interface GameMethods {
 					"src/socialIsland/Resources/tree1.png", 0.10, 0.10);
 
 		}
+		
+		// Draw the objects -- we didn't use a for loop because we only need to draw 2 items.
+		
+		GameObjects waterObject = objectsInGame.get("water");
+		
+		StdDraw.picture(waterObject.getxCoordinate(), waterObject.getyCoordinate(),
+					"src/socialIsland/Resources/water.png", 0.10, 0.10);
+		
+		GameObjects presentObject = objectsInGame.get("present");
+		
+		StdDraw.picture(presentObject.getxCoordinate(), presentObject.getyCoordinate(),
+				"src/socialIsland/Resources/present.png", 0.10, 0.10);
+		
 	}
 
 	// optionals:
@@ -100,14 +120,23 @@ public interface GameMethods {
 
 				// check that the distance between 2 points is greater than a specific value
 				if (i > 1) {
-					for (int j = 0; j < houseCoordinates.size(); j++) {
-						distanceToHouse = Math.sqrt(Math.pow((houseCoordinates.get(j).getX() - x), 2)
-								+ Math.pow((houseCoordinates.get(j).getY() - y), 2));
-						if (distanceToHouse < distanceBtwHouses) {
-							// System.out.println("Distance Too Small.");
+					if (i == 2) {
+						distanceToHouse = Math.sqrt(Math.pow((houseCoordinates.get(0).getX() - x), 2)
+								+ Math.pow((houseCoordinates.get(0).getY() - y), 2));
+						if (distanceToHouse < distanceBtwHouses && x < 0.75) {
 							break;
 						}
-
+					}
+					else {	
+						for (int j = 0; j < houseCoordinates.size(); j++) {
+							distanceToHouse = Math.sqrt(Math.pow((houseCoordinates.get(j).getX() - x), 2)
+									+ Math.pow((houseCoordinates.get(j).getY() - y), 2));
+							if (distanceToHouse < distanceBtwHouses) {
+								// System.out.println("Distance Too Small.");
+								break;
+							}
+	
+						}
 					}
 				}
 
@@ -188,7 +217,8 @@ public interface GameMethods {
 	 * @param yCoordinates
 	 * 
 	 */
-	public static void drawEnvironment(double[] xCoordinates, double[] yCoordinates, double[] treexCoordinates, double[] treeyCoordinates) {
+	public static void drawEnvironment(double[] xCoordinates, double[] yCoordinates, double[] treexCoordinates, 
+			double[] treeyCoordinates, ST<String, GameObjects> objectsInGame) {
 		// Set the game screen size
 		StdDraw.setCanvasSize(screenSize, screenSize);
 
@@ -212,12 +242,75 @@ public interface GameMethods {
 		for (int i = 0; i < treexCoordinates.length; i++) {
 			StdDraw.picture(treexCoordinates[i], treeyCoordinates[i], "src/socialIsland/Resources/tree1.png", 0.10, 0.10);
 		}
+		
+		GameObjects waterObject = objectsInGame.get("water");
+		
+		// Draw the objects -- we didn't use a for loop because we only need to draw 2 items.
+		if(waterObject.getCountofItem()==0) {
+			
+		
+			StdDraw.picture(waterObject.getxCoordinate(), waterObject.getyCoordinate(),
+					"src/socialIsland/Resources/water.png", 0.10, 0.10);
+		}
+		
+		GameObjects presentObject = objectsInGame.get("present");
+		
+		if(presentObject.getCountofItem()==0) {
+			
+			
+			StdDraw.picture(presentObject.getxCoordinate(), presentObject.getyCoordinate(),
+					"src/socialIsland/Resources/present.png", 0.10, 0.10);
+		}
 		// TODO:
 		//redraw trees
 		// redraw friendship status
 
 	}
+	
+	public static boolean isMouseOverObjectButtons(double mouseX, double mouseY, double ObjectX, double ObjectY) {
+		// Check if the mouse is over the button
+		double buttonWidthX = (0.8771 - 0.5958); // We determined the specific width by tracking our mouse clicks.
+		double buttonHeightY = (0.06 - 0); // We determined the specific width by tracking our mouse clicks.
+		// All buttons have the same width and height.
 
+		// checks the 4 quadrants of the character image using the coordinate of image
+		return mouseX >= ObjectX - buttonWidthX / 2 && mouseX <= ObjectX + buttonWidthX / 2 && mouseY >= ObjectY - buttonHeightY / 2
+				&& mouseY <= ObjectY + buttonHeightY / 2;
+	}
+//	
+//	public static String checkForClicksObjects (GameObjects[] gameobjects, Graph g, double[] xCoordinates,
+//			double[] yCoordinates, double[] plantxCoordinates, double[] plantyCoordinates, ST<String, GameObjects> objectsInGame ) {
+//		
+//		boolean mousePressed = false;
+//		while (true) {
+//			mousePressed = StdDraw.isMousePressed();
+//			if (mousePressed) {
+//				double mouseX = StdDraw.mouseX();
+//				double mouseY = StdDraw.mouseY();
+//				System.out.println("Mouse Location: " + mouseX + ", " + mouseY);
+//				// check if the coordinates of your mouse match the coordinates of a character
+//				for (int i = 1; i < 3; i++) {
+//					if (isMouseOverHouseButtons(mouseX, mouseY, gameobjects[i].getxCoordinate(),
+//							gameobjects[i].getyCoordinate())) {
+//						// PickedUpObject.
+//						objectsInGame.put(, gameobjects[i]);
+//					}
+//				}
+//				try {
+//					Thread.sleep(1_000);
+//				} catch (InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//
+//				mousePressed = false;
+////                if (!StdDraw.isMousePressed())
+////                    break;
+//			}
+//		}
+//		return "<> picked up.";
+//	}
+//	
 	/**
 	 * Checks if the mouse is positioned over a House button.
 	 * 
@@ -268,7 +361,7 @@ public interface GameMethods {
 	 */
 
 	public static void checkForClicksCharacters(Character[] characters, Graph g, double[] xCoordinates,
-			double[] yCoordinates, double[] plantxCoordinates, double[] plantyCoordinates ) {
+			double[] yCoordinates, double[] plantxCoordinates, double[] plantyCoordinates, ST<String, GameObjects> objectsInGame) {
 		// Continuous loop to check for mouse clicks
 		boolean mousePressed = false;
 		while (true) {
@@ -276,24 +369,51 @@ public interface GameMethods {
 			if (mousePressed) {
 				double mouseX = StdDraw.mouseX();
 				double mouseY = StdDraw.mouseY();
+				mousePressed = false;
 				System.out.println("Mouse Location: " + mouseX + ", " + mouseY);
 				// check if the coordinates of your mouse match the coordinates of a character
 				for (int i = 1; i < 6; i++) {
 					if (isMouseOverHouseButtons(mouseX, mouseY, characters[i].getxCoordinate(),
 							characters[i].getyCoordinate())) {
-						g = interaction(i, g, xCoordinates, yCoordinates, plantxCoordinates, plantyCoordinates);
-					}
+						g = interaction(i, g, xCoordinates, yCoordinates, plantxCoordinates, plantyCoordinates, objectsInGame);
+					}	
 				}
+				
 				try {
-					Thread.sleep(1_000);
+					Thread.sleep(250);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-
-				mousePressed = false;
+				
+				for (String key:objectsInGame.keys()) {
+					
+					GameObjects thisObjectClicked = objectsInGame.get(key);
+			
+					System.out.println("thisObjectClicked Key: " + key + " - Object: " + thisObjectClicked.toString());
+					
+					if (isMouseOverObjectButtons(mouseX, mouseY, thisObjectClicked.getxCoordinate(),
+							thisObjectClicked.getyCoordinate())) {
+						thisObjectClicked.setCountofItem(1);
+						objectsInGame.put(key, thisObjectClicked);
+						drawEnvironment(xCoordinates, yCoordinates, plantxCoordinates, plantyCoordinates, objectsInGame);
+						for (String key2:objectsInGame.keys()) 
+							System.out.println("All Keys Key: " + key2 + " - Object: " + objectsInGame.get(key2).toString());
+					}
+				}
+				try {
+					Thread.sleep(250);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 //                if (!StdDraw.isMousePressed())
 //                    break;
+			}
+			
+			if (g.degree(0)==5) {
+				StdDraw.picture(0.5, 0.5, "src/socialIsland/Resources/Congrats.png", 1, 1);
+				break;
 			}
 		}
 	}
@@ -306,7 +426,7 @@ public interface GameMethods {
 	 *         0 if no valid response button is clicked.
 	 */
 
-	public static int checkForClicksButtons() {
+	public static int checkForClicksButtons(int vertex, ST<String, GameObjects> objectsInGame) {
 		// Continuous loop to check for mouse clicks
 		boolean mousePressed = false;
 
@@ -317,20 +437,39 @@ public interface GameMethods {
 				double mouseY = StdDraw.mouseY();
 				System.out.println("Mouse Location: " + mouseX + ", " + mouseY);
 				try {
-					Thread.sleep(1_000);
+					Thread.sleep(500);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
 				if (isMouseOverResponseButtons(mouseX, mouseY, 0.73, 0.2171)) {
-					mousePressed = false;
+					mousePressed = false;  
+					GameObjects waterObject = objectsInGame.get("water");
+					GameObjects presentObject = objectsInGame.get("present");
+					GameObjects pretzelObject = objectsInGame.get("pretzel");
+					
+					if (vertex == waterObject.getDestinationVertex() && waterObject.getCountofItem()==0)
+						return 0; // neutral
+					
+					if (vertex == presentObject.getDestinationVertex() && presentObject.getCountofItem()==0)
+						return 0; // neutral
+					
+					if (vertex == presentObject.getDestinationVertex() && presentObject.getCountofItem()>0)
+						pretzelObject.setCountofItem(1);
+						
 					return 1; // positive
 				} else if (isMouseOverResponseButtons(mouseX, mouseY, 0.73, 0.126)) {
 					mousePressed = false;
 					return 0; // neutral
 				} else if (isMouseOverResponseButtons(mouseX, mouseY, 0.73, 0.0238)) {
 					mousePressed = false;
+					
+					GameObjects pretzelObject = objectsInGame.get("pretzel");
+					
+					if (vertex == pretzelObject.getDestinationVertex() && pretzelObject.getCountofItem()==0)
+						return 0; // neutral
+					
 					return -1; // negative
 				} else {
 					mousePressed = false;
@@ -411,12 +550,13 @@ public interface GameMethods {
 	 * @param yCoordinates The y-coordinates of characters/houses.
 	 */
 
-	public static Graph interaction(int vertex, Graph g, double[] xCoordinates, double[] yCoordinates, double[] plantxCoordinates, double[] plantyCoordinates) {
+	public static Graph interaction(int vertex, Graph g, double[] xCoordinates, double[] yCoordinates, double[] plantxCoordinates, 
+			double[] plantyCoordinates, ST<String, GameObjects> objectsInGame) {
 		// draw rectangle, question dialogue, 3 buttons
 		openPopupWindow(vertex);
 		// detect clicks while loop
 
-		int mouseReturned = checkForClicksButtons();
+		int mouseReturned = checkForClicksButtons(vertex, objectsInGame);
 		// If we don't put this in a variable, I think, this needs to run twice in the
 		// if else
 		// statement.
@@ -433,12 +573,12 @@ public interface GameMethods {
 				g.addEdge(0, vertex);
 			}
 			// erases buttons
-			drawEnvironment(xCoordinates, yCoordinates, plantxCoordinates, plantyCoordinates);
+			drawEnvironment(xCoordinates, yCoordinates, plantxCoordinates, plantyCoordinates, objectsInGame);
 			// displays response
 			StdDraw.picture(0.75, 0.50, "src/socialIsland/Resources/house" + vertex + "PosResponse.png", .5, .5);
 			StdDraw.pause(3_000);
 			// displays island
-			drawEnvironment(xCoordinates, yCoordinates, plantxCoordinates, plantyCoordinates);
+			drawEnvironment(xCoordinates, yCoordinates, plantxCoordinates, plantyCoordinates, objectsInGame);
 		} else if (mouseReturned == -1) { // Negative case
 			// creates friendship edge
 			boolean isAdj = false;
@@ -453,15 +593,15 @@ public interface GameMethods {
 			}
 
 			// erases buttons
-			drawEnvironment(xCoordinates, yCoordinates, plantxCoordinates, plantyCoordinates);
+			drawEnvironment(xCoordinates, yCoordinates, plantxCoordinates, plantyCoordinates, objectsInGame);
 			// displays response
 			StdDraw.picture(0.75, 0.50, "src/socialIsland/Resources/Nope.png", .5, .5);
 			StdDraw.pause(1_000);
 			// displays island
-			drawEnvironment(xCoordinates, yCoordinates, plantxCoordinates, plantyCoordinates);
+			drawEnvironment(xCoordinates, yCoordinates, plantxCoordinates, plantyCoordinates, objectsInGame);
 		} else { // Neutral case
 					// erases buttons
-			drawEnvironment(xCoordinates, yCoordinates, plantxCoordinates, plantyCoordinates);
+			drawEnvironment(xCoordinates, yCoordinates, plantxCoordinates, plantyCoordinates, objectsInGame);
 			// displays response
 			StdDraw.pause(1_000);
 		}
