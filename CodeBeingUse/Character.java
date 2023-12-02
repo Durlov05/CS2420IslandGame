@@ -82,8 +82,8 @@ public class Character {
 	 * Returns a string representation of the Character object, displaying its
 	 * features.
 	 * 
-	 * @return A string representing the character's details [name, image,
-	 *         coordinates, and vertex]
+	 * @return A string representing the character's details (name, image,
+	 *         coordinates, and vertex)
 	 */
 	@Override
 	public String toString() {
