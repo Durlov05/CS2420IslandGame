@@ -29,14 +29,14 @@ public interface GameMethods {
 	public int screenSize = 700;
 
 	/**
-	 * Draws a green island window and arranges characters (houses and animals)
-	 * randomly. Initializes characters with names, images, and random locations.
+	 * Draws a green island window and arranges characters randomly. Initializes
+	 * characters with names, images, and random locations.
 	 *
 	 * @param characters An array of Character objects representing the characters
 	 *                   in the game.
 	 */
 
-	public static void setEnvironment(Character[] characters) {
+	public static void setEnvironment(Character[] characters, List<Plant> plants) {
 
 		// Set the game screen size
 		StdDraw.setCanvasSize(screenSize, screenSize);
@@ -44,8 +44,9 @@ public interface GameMethods {
 		// create the title
 		StdDraw.setTitle("Social Island");
 
-		// Set the background color to green
+		// Set the background color to green grass
 		StdDraw.clear(StdDraw.GREEN);
+		StdDraw.picture(0.5, 0.5, "src/socialIsland/Resources/grass.png", 1, 1);
 
 		// set a small border so houses aren't drawn near the edges
 		StdDraw.setScale(-.05, 1.05);
@@ -56,6 +57,13 @@ public interface GameMethods {
 			StdDraw.picture(characters[i].getxCoordinate(), characters[i].getyCoordinate(), characters[i].getImage(),
 					houseScale, houseScale);
 		}
+
+		// Draw the trees
+		for (int k = 0; k < (plants.size() - 1); k++) {
+			StdDraw.picture(plants.get(k).getxCoordinate(), plants.get(k).getyCoordinate(),
+					"src/socialIsland/Resources/tree1.png", 0.10, 0.10);
+
+		}
 	}
 
 	// optionals:
@@ -65,7 +73,8 @@ public interface GameMethods {
 
 	/**
 	 * Initializes characters with random coordinates and prevents them from being
-	 * too close together.
+	 * too close together. This method should be called before setEnvironment() in
+	 * the main method.
 	 *
 	 * @param numCharacters The number of characters to initialize.
 	 * @return An array of initialized Character objects.
@@ -113,12 +122,63 @@ public interface GameMethods {
 			houseCoordinates.add(houseLocation);
 
 			characters[i] = new Character("House" + i, "src/socialIsland/Resources/house" + i + ".png", x, y, i);
-			// test print
-			for (int j = 1; j < numCharacters; j++) {
-				StdOut.println(characters[j]);
-			}
+
+		}
+		// test print
+		for (int j = 1; j < numCharacters; j++) {
+			StdOut.println(characters[j]);
 		}
 		return characters;
+	}
+
+	/**
+	 * Draws trees at random locations. Ensures that trees do not overlap with other
+	 * houses.
+	 * 
+	 * @param characters
+	 */
+	public static List<Plant> initializePlants(Character[] characters) {
+		List<Plant> trees = new ArrayList<Plant>();
+		// the number of trees is the natural log of the number of characters
+		int numTrees = ((int) Math.log(characters.length) + 10);
+		for (int i = 0; i <= numTrees; i++) {
+			double distanceToObj = 100.0;
+			double distanceBtwObj = 0.15;
+			double x;
+			double y;
+			int count = 0;
+			// Generate random coordinates for the trees
+			do {
+				x = StdRandom.uniformDouble();
+				y = StdRandom.uniformDouble();
+
+				// how many times the points had to generated to get a point that wasn't too
+				// close to a character
+				count++;
+
+				// check that the trees are not too close to the houses
+				for (int j = 1; j < characters.length; j++) {
+					distanceToObj = Math.sqrt(Math.pow((characters[j].getxCoordinate() - x), 2)
+							+ Math.pow((characters[j].getyCoordinate() - y), 2));
+					if (distanceToObj < distanceBtwObj) {
+						// System.out.println("Distance Too Small.");
+						break;
+					}
+
+				}
+
+				if (count > 1000) {
+					System.out.println("Count was exceeded.");
+					break;
+				}
+
+			} while (distanceToObj < distanceBtwObj);
+
+			Plant tree = new Plant(x, y);
+			trees.add(tree);
+
+		}
+		return trees;
 	}
 
 	/**
@@ -126,10 +186,9 @@ public interface GameMethods {
 	 * 
 	 * @param xCoordinates
 	 * @param yCoordinates
-	 * @author Eliza Kitchens // How about we skip specific call outs of methods and
-	 *         just generally state what portions we worked on in the video?
+	 * 
 	 */
-	public static void drawEnvironment(double[] xCoordinates, double[] yCoordinates) {
+	public static void drawEnvironment(double[] xCoordinates, double[] yCoordinates, double[] treexCoordinates, double[] treeyCoordinates) {
 		// Set the game screen size
 		StdDraw.setCanvasSize(screenSize, screenSize);
 
@@ -138,6 +197,7 @@ public interface GameMethods {
 
 		// Set the background color to green
 		StdDraw.clear(StdDraw.GREEN);
+		StdDraw.picture(0.5, 0.5, "src/socialIsland/Resources/grass.png", 1, 1);
 
 		// set a small border so houses aren't drawn near the edges
 		StdDraw.setScale(-.05, 1.05);
@@ -147,8 +207,13 @@ public interface GameMethods {
 			StdDraw.picture(xCoordinates[i], yCoordinates[i], "src/socialIsland/Resources/house" + i + ".png",
 					houseScale, houseScale);
 		}
-
+		
+		//re draw the trees in the same location
+		for (int i = 0; i < treexCoordinates.length; i++) {
+			StdDraw.picture(treexCoordinates[i], treeyCoordinates[i], "src/socialIsland/Resources/tree1.png", 0.10, 0.10);
+		}
 		// TODO:
+		//redraw trees
 		// redraw friendship status
 
 	}
@@ -203,7 +268,7 @@ public interface GameMethods {
 	 */
 
 	public static void checkForClicksCharacters(Character[] characters, Graph g, double[] xCoordinates,
-			double[] yCoordinates) {
+			double[] yCoordinates, double[] plantxCoordinates, double[] plantyCoordinates ) {
 		// Continuous loop to check for mouse clicks
 		boolean mousePressed = false;
 		while (true) {
@@ -216,7 +281,7 @@ public interface GameMethods {
 				for (int i = 1; i < 6; i++) {
 					if (isMouseOverHouseButtons(mouseX, mouseY, characters[i].getxCoordinate(),
 							characters[i].getyCoordinate())) {
-						g = interaction(i, g, xCoordinates, yCoordinates);
+						g = interaction(i, g, xCoordinates, yCoordinates, plantxCoordinates, plantyCoordinates);
 					}
 				}
 				try {
@@ -276,10 +341,13 @@ public interface GameMethods {
 
 	}
 
+	/**
+	 * Method draws the interaction pop-up and interaction buttons.
+	 * 
+	 * @param i
+	 */
 	private static void openPopupWindow(int i) {
-		// Implement the logic to open a pop-up window
-		// For example, you can create another StdDraw window
-		// and draw whatever content you want in that window
+
 		double buttonScale = 0.5;
 
 		switch (i) {
@@ -303,10 +371,10 @@ public interface GameMethods {
 		case 3:
 			StdDraw.picture(0.75, 0.50, "src/socialIsland/Resources/house3Question.png", .5, .5);
 			StdDraw.pause(3_000);
-			StdDraw.picture(0.73, 0.2, "src/socialIsland/Resources/Thanks for the present.png", buttonScale,
+			StdDraw.picture(0.73, 0.2, "src/socialIsland/Resources/Thanks for the cake.png", buttonScale,
 					buttonScale);
 			StdDraw.picture(0.73, 0.1, "src/socialIsland/Resources/not right now.png", buttonScale, buttonScale);
-			StdDraw.picture(0.73, 0.00, "src/socialIsland/Resources/I don't like your presents.png", buttonScale,
+			StdDraw.picture(0.73, 0.00, "src/socialIsland/Resources/I don't like cake.png", buttonScale,
 					buttonScale);
 			break;
 		case 4:
@@ -343,7 +411,7 @@ public interface GameMethods {
 	 * @param yCoordinates The y-coordinates of characters/houses.
 	 */
 
-	public static Graph interaction(int vertex, Graph g, double[] xCoordinates, double[] yCoordinates) {
+	public static Graph interaction(int vertex, Graph g, double[] xCoordinates, double[] yCoordinates, double[] plantxCoordinates, double[] plantyCoordinates) {
 		// draw rectangle, question dialogue, 3 buttons
 		openPopupWindow(vertex);
 		// detect clicks while loop
@@ -365,12 +433,12 @@ public interface GameMethods {
 				g.addEdge(0, vertex);
 			}
 			// erases buttons
-			drawEnvironment(xCoordinates, yCoordinates);
+			drawEnvironment(xCoordinates, yCoordinates, plantxCoordinates, plantyCoordinates);
 			// displays response
 			StdDraw.picture(0.75, 0.50, "src/socialIsland/Resources/house" + vertex + "PosResponse.png", .5, .5);
-			StdDraw.pause(1_000);
+			StdDraw.pause(3_000);
 			// displays island
-			drawEnvironment(xCoordinates, yCoordinates);
+			drawEnvironment(xCoordinates, yCoordinates, plantxCoordinates, plantyCoordinates);
 		} else if (mouseReturned == -1) { // Negative case
 			// creates friendship edge
 			boolean isAdj = false;
@@ -385,15 +453,15 @@ public interface GameMethods {
 			}
 
 			// erases buttons
-			drawEnvironment(xCoordinates, yCoordinates);
+			drawEnvironment(xCoordinates, yCoordinates, plantxCoordinates, plantyCoordinates);
 			// displays response
 			StdDraw.picture(0.75, 0.50, "src/socialIsland/Resources/Nope.png", .5, .5);
 			StdDraw.pause(1_000);
 			// displays island
-			drawEnvironment(xCoordinates, yCoordinates);
+			drawEnvironment(xCoordinates, yCoordinates, plantxCoordinates, plantyCoordinates);
 		} else { // Neutral case
 					// erases buttons
-			drawEnvironment(xCoordinates, yCoordinates);
+			drawEnvironment(xCoordinates, yCoordinates, plantxCoordinates, plantyCoordinates);
 			// displays response
 			StdDraw.pause(1_000);
 		}
