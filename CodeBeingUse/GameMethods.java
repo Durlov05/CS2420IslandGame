@@ -412,7 +412,7 @@ public interface GameMethods {
 			}
 			
 			if (g.degree(0)==5) {
-				StdDraw.picture(0.5, 0.5, "src/socialIsland/Resources/Congrats.png", 1, 1);
+				StdDraw.picture(0.5, 0.5, "src/socialIsland/Resources/mayor.png", 1, 1);
 				break;
 			}
 		}
